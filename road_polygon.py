@@ -40,6 +40,7 @@ import math
     def road_polygon(self, points):
         i = 0
         pts_dict = {}
+        right_points = []
         ccw_ord_pts = []
         x_sorted_non_fused = sorted(points, key=operator.itemgetter(0))
         x_sorted = self.fuse(x_sorted_non_fused, 0.5)
@@ -58,13 +59,17 @@ import math
                     # This should be max and loop should exit
                     ccw_ord_pts.append(x_sorted[i+1])
                     origin = x_sorted[i+1]
+            #print(next_pts)
             angles = [math.atan2(pt[1] - origin[1], pt[0] - origin[0])\
                     for pt in next_pts]
             # Converting 0 to left side
             angles = map(math.degrees, angles)
+            #print(angles)
             pts_dict = {angles[j]: next_pts[j] for j in range(len(angles))}
             origin = pts_dict[min(angles)]
+            #print(origin)
             i += next_pts.index(origin) + 1
+            right_points.append(origin)
             ccw_ord_pts.append(origin)
 
         x_sorted = sorted(x_sorted, key=operator.itemgetter(0), reverse=True)
@@ -81,12 +86,19 @@ import math
                     # This should be max and loop should exit
                     origin = x_sorted[i+1]
 
+            for i, pt in enumerate(next_pts):
+                if pt in right_points:
+                    del next_pts[i]
+
             angles = [math.atan2(pt[1] - origin[1], pt[0] - origin[0])\
                     for pt in next_pts]
             angles = map(math.degrees, angles)
             angles = [ang + 360 if ang < 0 else ang for ang in angles]
+            #print(next_pts)
+            #print(angles)
             pts_dict = {angles[j]: next_pts[j] for j in range(len(angles))}
             origin = pts_dict[min(angles)]
+            #print(origin)
             i += next_pts.index(origin) + 1
             ccw_ord_pts.append(origin)
 
